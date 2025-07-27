@@ -663,24 +663,6 @@
             line-height: 1.2; /* Adjusted line height */
         }
 
-        /* Estilos de impresión para ocultar la interfaz de usuario */
-        @media print {
-            body > *:not(.pdf-template) {
-                display: none !important;
-            }
-            .pdf-template {
-                display: block !important;
-                width: 100% !important;
-                height: auto !important;
-                position: absolute;
-                top: 0;
-                left: 0;
-                margin: 0;
-                padding: 0;
-                box-shadow: none;
-            }
-        }
-
         /* --- Estilos para Mensajes Emergentes Personalizados --- */
         .custom-alert-overlay {
             position: fixed;
@@ -864,6 +846,130 @@
             background-color: var(--danger-color);
         }
 
+        /* PDF Template for Cuenta de Cobro specific styles */
+        .pdf-template-cobro {
+            width: 612pt; /* Letter size width */
+            padding: 40pt;
+            box-sizing: border-box;
+            background: white;
+            font-family: 'Times New Roman', Times, serif;
+            color: #333;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            justify-content: flex-start; /* Align content to top */
+            min-height: 792pt; /* Letter size height */
+            line-height: 1.2;
+        }
+
+        .pdf-cobro-header {
+            display: flex; /* Changed to flex for side-by-side */
+            justify-content: space-between; /* Space between logo and info */
+            align-items: center; /* Vertically center */
+            margin-bottom: 20pt; /* Reduced margin */
+            padding-bottom: 10pt;
+            border-bottom: 1pt solid #eee; /* Lighter border */
+        }
+
+        .pdf-cobro-header img {
+            max-width: 100pt; /* Smaller logo */
+            height: auto;
+            margin-right: 15pt; /* Space between logo and info */
+            margin-bottom: 0; /* Remove bottom margin */
+        }
+
+        .pdf-cobro-header .company-info {
+            text-align: right; /* Align company info to the right */
+            margin-bottom: 0; /* Remove bottom margin */
+        }
+
+        .pdf-cobro-header .company-info h1 {
+            color: var(--primary-color);
+            font-size: 12pt; /* Smaller font size */
+            margin: 0;
+            text-transform: uppercase;
+        }
+
+        .pdf-cobro-header .company-info p {
+            margin: 1pt 0; /* Reduced margin */
+            font-size: 8pt; /* Smaller font size */
+            color: #555;
+        }
+
+        .pdf-cobro-title {
+            font-size: 24pt;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-bottom: 20pt;
+            text-align: center;
+        }
+
+        /* New style for large debtor info */
+        .pdf-large-debtor-info {
+            text-align: center;
+            margin-bottom: 30pt; /* Space before "DEBE A:" */
+            line-height: 1.2;
+        }
+
+        .pdf-large-debtor-info p {
+            font-size: 18pt; /* Large font size */
+            font-weight: bold;
+            color: var(--primary-color); /* Highlight color */
+            margin: 5pt 0;
+        }
+        .pdf-large-debtor-info .nit {
+            font-size: 14pt; /* Slightly smaller for NIT */
+            color: var(--text-color);
+        }
+
+
+        .pdf-cobro-section {
+            margin-bottom: 15pt;
+            font-size: 10.5pt;
+            line-height: 1.4;
+        }
+
+        .pdf-cobro-section strong {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .pdf-cobro-amount {
+            font-size: 16pt;
+            font-weight: bold;
+            text-align: center;
+            margin: 20pt 0;
+            color: var(--primary-color);
+        }
+
+        .pdf-cobro-concepts ul {
+            list-style: disc;
+            margin-left: 20pt;
+            padding: 0;
+            font-size: 10pt;
+        }
+
+        .pdf-cobro-concepts ul li {
+            margin-bottom: 5pt;
+        }
+
+        .pdf-cobro-signature {
+            margin-top: 40pt;
+            text-align: center;
+            font-size: 10pt;
+        }
+
+        .pdf-cobro-signature p {
+            margin: 5pt 0;
+        }
+
+        .pdf-cobro-bank-info {
+            margin-top: 30pt;
+            font-size: 9.5pt;
+            text-align: center;
+            color: #666;
+            border-top: 1pt dashed #ccc;
+            padding-top: 15pt;
+        }
 
         /* MEDIA QUERIES FOR RESPONSIVE DESIGN */
 
@@ -1080,8 +1186,9 @@
         <img src="LOGO COLOR.png" alt="Logo Restauraciones y servicios" class="logo">
         <ul>
             <li><a href="#" onclick="showSection('homeSection')" class="active"><i class="fas fa-home"></i> Inicio</a></li>
-            <li><a href="#" onclick="showSection('createInvoiceSection')"><i class="fas fa-file-invoice"></i> Crear Factura</a></li>
-            <li><a href="#" onclick="showSection('manageInvoicesSection')"><i class="fas fa-list-alt"></i> Gestionar Facturas</a></li>
+            <li><a href="#" onclick="showSection('createInvoiceSection')"><i class="fas fa-file-invoice"></i> Crear Factura/Cotización/OS</a></li>
+            <li><a href="#" onclick="showSection('createCobroSection')"><i class="fas fa-money-check-alt"></i> Crear Cuenta de Cobro</a></li>
+            <li><a href="#" onclick="showSection('manageInvoicesSection')"><i class="fas fa-list-alt"></i> Gestionar Documentos</a></li>
             <li><a href="#" onclick="showSection('settingsSection')"><i class="fas fa-cogs"></i> Ajustes</a></li>
         </ul>
     </div>
@@ -1096,7 +1203,7 @@
             <div class="summary-cards">
                 <div class="summary-card blue">
                     <i class="fas fa-file-invoice-dollar"></i>
-                    <h3>Facturas Totales</h3>
+                    <h3>Documentos Totales</h3>
                     <p id="totalInvoices">0</p>
                 </div>
                 <div class="summary-card green">
@@ -1106,16 +1213,17 @@
                 </div>
                 <div class="summary-card purple">
                     <i class="fas fa-calendar-alt"></i>
-                    <h3>Facturas Este Año</h3>
+                    <h3>Documentos Este Año</h3>
                     <p id="invoicesThisYear">0</p>
                 </div>
             </div>
-            <h3>Últimas Facturas</h3>
+            <h3>Últimos Documentos</h3>
             <div class="invoice-table-container">
                 <table class="invoice-table">
                     <thead>
                         <tr>
-                            <th># Factura</th>
+                            <th># Documento</th>
+                            <th>Tipo</th>
                             <th>Cliente</th>
                             <th>Fecha</th>
                             <th>Total</th>
@@ -1123,14 +1231,14 @@
                         </tr>
                     </thead>
                     <tbody id="latestInvoicesTableBody">
-                        <tr><td colspan="5" style="text-align: center;">No hay facturas recientes.</td></tr>
+                        <tr><td colspan="6" style="text-align: center;">No hay documentos recientes.</td></tr>
                     </tbody>
                 </table>
             </div>
         </section>
 
         <section id="createInvoiceSection" class="section">
-            <h2>Crear Nueva Factura</h2>
+            <h2>Crear Nueva Factura / Cotización / Orden de Servicio</h2>
             <form id="invoiceForm">
                 <input type="hidden" id="invoiceId">
                 <div class="form-group">
@@ -1174,7 +1282,7 @@
                     <label for="telefono">Teléfono:</label>
                     <input type="text" id="telefono" name="telefono">
                 </div>
-                <h3>Detalles de la Factura</h3>
+                <h3>Detalles del Documento</h3>
                 <div id="itemsContainer" class="item-list">
                 </div>
                 <button type="button" class="add-item-btn" onclick="addItem()">Añadir Ítem</button>
@@ -1207,21 +1315,80 @@
                     <textarea id="notas" name="notas"></textarea>
                 </div>
                 <div class="button-group">
-                    <button type="submit" class="btn btn-primary">Guardar Factura</button>
+                    <button type="submit" class="btn btn-primary">Guardar Documento</button>
                     <button type="button" class="btn btn-secondary" onclick="resetForm()">Cancelar</button>
                     <button type="button" class="btn btn-success" onclick="generatePdf()">Generar PDF</button>
                 </div>
             </form>
         </section>
 
+        <section id="createCobroSection" class="section">
+            <h2>Crear Nueva Cuenta de Cobro</h2>
+            <form id="cobroForm">
+                <input type="hidden" id="cobroId">
+                <div class="form-group">
+                    <label for="cobroFecha">Fecha:</label>
+                    <input type="date" id="cobroFecha" name="cobroFecha" required>
+                </div>
+                <div class="form-group">
+                    <label for="cobroNumero">Número de Cuenta de Cobro:</label>
+                    <input type="text" id="cobroNumero" name="cobroNumero" required readonly>
+                </div>
+                <h3>Datos de la Empresa a Cobrar</h3>
+                <div class="form-group">
+                    <label for="cobroEmpresaACobrar">Nombre de la Empresa a Cobrar:</label>
+                    <input type="text" id="cobroEmpresaACobrar" name="cobroEmpresaACobrar" required>
+                </div>
+                <div class="form-group">
+                    <label for="cobroNitDeudor">NIT de la Empresa a Cobrar:</label>
+                    <input type="text" id="cobroNitDeudor" name="cobroNitDeudor">
+                </div>
+                <div class="form-group">
+                    <label for="cobroSuma">LA SUMA DE (valor numérico):</label>
+                    <input type="number" id="cobroSuma" name="cobroSuma" min="0" step="0.01" required oninput="updateCobroAmountText()">
+                </div>
+                <div class="form-group">
+                    <label for="cobroSumaTexto">LA SUMA DE (en texto):</label>
+                    <input type="text" id="cobroSumaTexto" name="cobroSumaTexto" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="cobroConceptos">Por concepto de (cada concepto en una línea nueva):</label>
+                    <textarea id="cobroConceptos" name="cobroConceptos" rows="5" placeholder="Ej:&#10;- Servicio de consultoría&#10;- Venta de materiales"></textarea>
+                </div>
+                <h3>Datos de la Persona que Cobra</h3>
+                <div class="form-group">
+                    <label for="cobroPersonaQueCobra">Nombre de la Persona que Cobra:</label>
+                    <input type="text" id="cobroPersonaQueCobra" name="cobroPersonaQueCobra" required>
+                </div>
+                <div class="form-group">
+                    <label for="cobroCcCreditor">C.C. de la Persona que Cobra:</label>
+                    <input type="text" id="cobroCcCreditor" name="cobroCcCreditor">
+                </div>
+                <div class="form-group">
+                    <label for="cobroTelefonoCreditor">Teléfono de la Persona que Cobra:</label>
+                    <input type="text" id="cobroTelefonoCreditor" name="cobroTelefonoCreditor">
+                </div>
+                <div class="form-group">
+                    <label for="cobroDireccionCreditor">Dirección de la Persona que Cobra:</label>
+                    <input type="text" id="cobroDireccionCreditor" name="cobroDireccionCreditor">
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Guardar Cuenta de Cobro</button>
+                    <button type="button" class="btn btn-secondary" onclick="resetCobroForm()">Cancelar</button>
+                    <button type="button" class="btn btn-success" onclick="generateCobroPdf()">Generar PDF</button>
+                </div>
+            </form>
+        </section>
+
         <section id="manageInvoicesSection" class="section">
-            <h2>Gestionar Facturas</h2>
-            <input type="text" id="searchInvoice" placeholder="Buscar por cliente, # factura..." onkeyup="filterInvoices()">
+            <h2>Gestionar Documentos</h2>
+            <input type="text" id="searchInvoice" placeholder="Buscar por cliente, # documento..." onkeyup="filterInvoices()">
             <div class="invoice-table-container">
                 <table class="invoice-table">
                     <thead>
                         <tr>
                             <th># Documento</th>
+                            <th>Tipo</th>
                             <th>Cliente</th>
                             <th>Fecha</th>
                             <th>Total</th>
@@ -1257,6 +1424,19 @@
                 <label for="companyNIT">NIT de la Empresa:</label>
                 <input type="text" id="companyNIT">
             </div>
+            <h3>Información Bancaria (para Cuentas de Cobro)</h3>
+            <div class="form-group">
+                <label for="bankName">Nombre del Banco:</label>
+                <input type="text" id="bankName">
+            </div>
+            <div class="form-group">
+                <label for="accountType">Tipo de Cuenta:</label>
+                <input type="text" id="accountType" placeholder="Ej: Ahorros, Corriente">
+            </div>
+            <div class="form-group">
+                <label for="accountNumber">Número de Cuenta:</label>
+                <input type="text" id="accountNumber">
+            </div>
             <div class="form-group">
                 <label for="companyLogoFile">Subir Logo (para PDF):</label>
                 <input type="file" id="companyLogoFile" accept="image/*" onchange="previewLogo(event)">
@@ -1282,6 +1462,7 @@
 
     <div class="toast-container" id="toastContainer"></div>
 
+    <!-- PDF Template for Factura/Cotizacion/Orden de Servicio -->
     <div class="pdf-template" id="pdfTemplate">
         <div class="pdf-header">
             <div class="pdf-header-info">
@@ -1294,7 +1475,8 @@
             <img id="pdfCompanyLogo" src="LOGO COLOR.png" alt="Logo de tu Empresa" style="max-width: 150pt; height: auto;">
         </div>
 
-        <h2 class="pdf-document-title" id="pdfDocumentTitle"></h2> <div class="pdf-invoice-details">
+        <h2 class="pdf-document-title" id="pdfDocumentTitle"></h2>
+        <div class="pdf-invoice-details">
             <div>
                 <h3>CLIENTE</h3>
                 <p><strong>Nombre:</strong> <span id="pdfClienteNombre"></span></p>
@@ -1369,11 +1551,66 @@
         </div>
     </div>
 
+    <!-- PDF Template for Cuenta de Cobro -->
+    <div class="pdf-template-cobro" id="pdfCobroTemplate">
+        <div class="pdf-cobro-header">
+            <img id="pdfCobroCompanyLogo" src="LOGO COLOR.png" alt="Logo de tu Empresa">
+            <div class="company-info">
+                <h1 id="pdfCobroCompanyName">NOMBRE DE TU EMPRESA</h1>
+                <p id="pdfCobroCompanyNIT">NIT: XXX.XXX.XXX-X</p>
+                <p id="pdfCobroCompanyAddress">Dirección de tu Empresa</p>
+                <p id="pdfCobroCompanyPhone">Teléfono: (XXX) XXX-XXXX</p>
+                <p id="pdfCobroCompanyEmail">Email: tu_correo@empresa.com</p>
+            </div>
+        </div>
+
+        <h2 class="pdf-cobro-title">Cuenta de cobro <span id="pdfCobroNumero"></span></h2>
+
+        <div class="pdf-large-debtor-info">
+            <p id="pdfCobroEmpresaACobrarGrande"></p>
+            <p class="nit" id="pdfCobroNitDeudorGrande"></p>
+        </div>
+
+        <div class="pdf-cobro-section">
+            <p><strong>DEBE A:</strong></p>
+            <p><span id="pdfCobroPersonaQueCobra"></span></p>
+            <p>C.C. <span id="pdfCobroCcCreditor"></span> de <span id="pdfCobroCiudadCreditor"></span> (<span id="pdfCobroDepartamentoCreditor"></span>).</p>
+        </div>
+
+        <div class="pdf-cobro-section">
+            <p><strong>LA SUMA DE:</strong></p>
+            <p class="pdf-cobro-amount"><span id="pdfCobroSumaTexto"></span> (<span id="pdfCobroSumaNumerica"></span>)</p>
+        </div>
+
+        <div class="pdf-cobro-section pdf-cobro-concepts">
+            <p><strong>Por concepto de:</strong></p>
+            <ul id="pdfCobroConceptosList">
+                <!-- Conceptos se insertarán aquí -->
+            </ul>
+        </div>
+
+        <div class="pdf-cobro-signature">
+            <p>Atentamente,</p>
+            <p><span id="pdfCobroFirmaPersonaQueCobra"></span></p>
+            <p>C.C. <span id="pdfCobroFirmaCcCreditor"></span></p>
+            <p>Teléfono <span id="pdfCobroFirmaTelefonoCreditor"></span></p>
+            <p>Dirección <span id="pdfCobroFirmaDireccionCreditor"></span></p>
+        </div>
+
+        <div class="pdf-cobro-bank-info">
+            <p>*Cuenta del banco para consignar el dinero:</p>
+            <p><strong>Banco:</strong> <span id="pdfCobroBankName"></span></p>
+            <p><strong>Tipo de Cuenta:</strong> <span id="pdfCobroAccountType"></span></p>
+            <p><strong>Número de Cuenta:</strong> <span id="pdfCobroAccountNumber"></span></p>
+        </div>
+    </div>
+
+
     <script>
         // Variables globales para almacenar datos
-        let invoices = [];
+        let invoices = []; // This will now store all types of documents (facturas, cotizaciones, OS, cobros)
         let currentEditingInvoiceId = null; // Para saber si estamos editando una factura
-        const LOCAL_STORAGE_KEY = 'restauraciones_servicios_facturas_data'; // Updated key
+        const LOCAL_STORAGE_KEY = 'restauraciones_servicios_documentos_data'; // Updated key for all documents
         const SETTINGS_STORAGE_KEY = 'restauraciones_servicios_settings'; // Updated key
         const LAST_NUMBER_KEY = 'restauraciones_servicios_last_document_numbers'; // Updated key
 
@@ -1453,16 +1690,32 @@
 
         // Cargar ajustes y datos guardados al iniciar
         function loadData() {
-            const storedInvoices = localStorage.getItem(LOCAL_STORAGE_KEY);
-            if (storedInvoices) {
-                invoices = JSON.parse(storedInvoices);
+            try {
+                const storedInvoices = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (storedInvoices) {
+                    invoices = JSON.parse(storedInvoices);
+                    console.log('Datos cargados desde localStorage:', invoices);
+                } else {
+                    invoices = [];
+                    console.log('No hay datos guardados en localStorage. Inicializando invoices como vacío.');
+                }
+            } catch (e) {
+                console.error('Error al cargar datos de localStorage:', e);
+                invoices = []; // Ensure invoices is an array even on error
+                showAlert('Error al cargar datos guardados. Los datos podrían estar corruptos.', 'error');
             }
             loadSettings(); // Cargar ajustes
         }
 
         // Guardar datos en localStorage
         function saveData() {
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(invoices));
+            try {
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(invoices));
+                console.log('Datos guardados en localStorage:', invoices);
+            } catch (e) {
+                console.error('Error al guardar datos en localStorage:', e);
+                showAlert('Error al guardar datos. Por favor, verifica el espacio de almacenamiento de tu navegador.', 'error');
+            }
         }
 
         function loadSettings() {
@@ -1479,6 +1732,9 @@
             document.getElementById('companyPhone').value = settings.companyPhone || '';
             document.getElementById('companyEmail').value = settings.companyEmail || '';
             document.getElementById('companyNIT').value = settings.companyNIT || '';
+            document.getElementById('bankName').value = settings.bankName || ''; // New
+            document.getElementById('accountType').value = settings.accountType || ''; // New
+            document.getElementById('accountNumber').value = settings.accountNumber || ''; // New
 
             // Cargar y mostrar previsualización del logo Base64
             const companyLogoPreview = document.getElementById('companyLogoPreview');
@@ -1500,6 +1756,9 @@
             settings.companyPhone = document.getElementById('companyPhone').value.trim();
             settings.companyEmail = document.getElementById('companyEmail').value.trim();
             settings.companyNIT = document.getElementById('companyNIT').value.trim();
+            settings.bankName = document.getElementById('bankName').value.trim(); // New
+            settings.accountType = document.getElementById('accountType').value.trim(); // New
+            settings.accountNumber = document.getElementById('accountNumber').value.trim(); // New
             // companyLogoBase64 ya se actualiza en previewLogo() o clearLogo()
 
             localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
@@ -1560,6 +1819,9 @@
                     resetForm();
                 }
                 generateInvoiceNumber(); // Generate a new number for new invoice
+            } else if (sectionId === 'createCobroSection') {
+                resetCobroForm(); // Reset cobro form when navigating to it
+                generateCobroNumber(); // Generate a new number for new cobro
             }
             updateSummary(); // Update summary on any section change
         }
@@ -1589,7 +1851,8 @@
                 lastNumbers[year][month] = {
                     'Factura de Servicio / Venta': 0,
                     'Cotización': 0,
-                    'Orden de Servicio': 0
+                    'Orden de Servicio': 0,
+                    'Cuenta de Cobro': 0 // New type
                 };
             }
 
@@ -1601,18 +1864,51 @@
             const prefixMap = {
                 'Factura de Servicio / Venta': 'FAC',
                 'Cotización': 'COT',
-                'Orden de Servicio': 'OS'
+                'Orden de Servicio': 'OS',
+                'Cuenta de Cobro': 'COB' // New prefix
             };
             const prefix = prefixMap[tipoDoc];
 
             document.getElementById('numeroFactura').value = `${prefix}-${year}${month}-${String(currentNumber).padStart(3, '0')}`;
         }
 
+        function generateCobroNumber() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = (today.getMonth() + 1).toString().padStart(2, '0');
+            const tipoDoc = 'Cuenta de Cobro'; // Fixed type for this specific form
+
+            let lastNumbers = JSON.parse(localStorage.getItem(LAST_NUMBER_KEY) || '{}');
+            
+            if (!lastNumbers[year]) {
+                lastNumbers = {};
+                lastNumbers[year] = {};
+            }
+            if (!lastNumbers[year][month]) {
+                lastNumbers[year][month] = {
+                    'Factura de Servicio / Venta': 0,
+                    'Cotización': 0,
+                    'Orden de Servicio': 0,
+                    'Cuenta de Cobro': 0
+                };
+            }
+
+            let currentNumber = lastNumbers[year][month][tipoDoc] || 0;
+            currentNumber++;
+            lastNumbers[year][month][tipoDoc] = currentNumber;
+            localStorage.setItem(LAST_NUMBER_KEY, JSON.stringify(lastNumbers));
+
+            document.getElementById('cobroNumero').value = `COB-${year}${month}-${String(currentNumber).padStart(3, '0')}`;
+        }
+
+
         // Llenar la fecha actual al cargar el formulario de crear factura
         document.addEventListener('DOMContentLoaded', () => {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('fechaFactura').value = today;
-            generateInvoiceNumber(); // Generate on load
+            document.getElementById('cobroFecha').value = today; // Set for cobro form
+            generateInvoiceNumber(); // Generate on load for invoice form
+            generateCobroNumber(); // Generate on load for cobro form
         });
 
         // Items logic
@@ -1726,7 +2022,7 @@
             });
         }
 
-        // Form submission and data handling
+        // Form submission and data handling for Factura/Cotizacion/OS
         document.getElementById('invoiceForm').addEventListener('submit', function(event) {
             event.preventDefault();
 
@@ -1762,11 +2058,11 @@
             let total = subtotal + totalImpuesto - descuento;
             if (total < 0) total = 0;
 
-            const invoiceData = {
+            const documentData = { // Renamed from invoiceData to documentData
                 id: document.getElementById('invoiceId').value || generateUniqueId(),
                 tipoDocumento,
-                fechaFactura,
-                numeroFactura,
+                fechaDocumento: fechaFactura, // Renamed for consistency
+                numeroDocumento: numeroFactura, // Renamed for consistency
                 cliente: {
                     nombre: clienteNombre,
                     direccion: clienteDireccion,
@@ -1785,25 +2081,83 @@
                 status: 'Realizado' // Default status for new/saved invoices
             };
 
+            console.log('Datos del documento a guardar (Factura/Cotización/OS):', documentData);
+
             if (currentEditingInvoiceId) {
-                // Update existing invoice
-                const index = invoices.findIndex(inv => inv.id === currentEditingInvoiceId);
+                // Update existing document
+                const index = invoices.findIndex(doc => doc.id === currentEditingInvoiceId);
                 if (index !== -1) {
-                    invoices[index] = invoiceData;
-                    showAlert('Factura actualizada exitosamente.', 'success');
+                    invoices[index] = documentData;
+                    showAlert('Documento actualizado exitosamente.', 'success');
                 }
                 currentEditingInvoiceId = null; // Reset editing state
             } else {
-                // Add new invoice
-                invoices.push(invoiceData);
-                showAlert('Factura guardada exitosamente.', 'success');
+                // Add new document
+                invoices.push(documentData);
+                showAlert('Documento guardado exitosamente.', 'success');
             }
 
             saveData();
             resetForm();
             renderInvoicesTable();
             updateSummary();
-            showSection('manageInvoicesSection'); // Go to manage invoices after saving
+            showSection('manageInvoicesSection'); // Go to manage documents after saving
+        });
+
+        // Form submission and data handling for Cuenta de Cobro
+        document.getElementById('cobroForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const cobroFecha = document.getElementById('cobroFecha').value;
+            const cobroNumero = document.getElementById('cobroNumero').value;
+            const cobroEmpresaACobrar = document.getElementById('cobroEmpresaACobrar').value.trim();
+            const cobroNitDeudor = document.getElementById('cobroNitDeudor').value.trim();
+            const cobroSuma = parseFloat(document.getElementById('cobroSuma').value) || 0;
+            const cobroConceptos = document.getElementById('cobroConceptos').value.trim();
+            const cobroPersonaQueCobra = document.getElementById('cobroPersonaQueCobra').value.trim();
+            const cobroCcCreditor = document.getElementById('cobroCcCreditor').value.trim();
+            const cobroTelefonoCreditor = document.getElementById('cobroTelefonoCreditor').value.trim();
+            const cobroDireccionCreditor = document.getElementById('cobroDireccionCreditor').value.trim();
+
+            const documentData = {
+                id: document.getElementById('cobroId').value || generateUniqueId(),
+                tipoDocumento: 'Cuenta de Cobro',
+                fechaDocumento: cobroFecha,
+                numeroDocumento: cobroNumero,
+                cliente: { // Using 'cliente' structure for consistency in main array
+                    nombre: cobroEmpresaACobrar,
+                    nit: cobroNitDeudor,
+                    // Other fields like direccion, solicitante, correo, telefono are not applicable for debtor in cobro
+                },
+                cobroDetails: { // Specific details for Cuenta de Cobro
+                    suma: cobroSuma,
+                    conceptos: cobroConceptos,
+                    personaQueCobra: cobroPersonaQueCobra,
+                    ccCreditor: cobroCcCreditor,
+                    telefonoCreditor: cobroTelefonoCreditor,
+                    direccionCreditor: cobroDireccionCreditor
+                },
+                total: cobroSuma, // Total is simply the sum for cobro
+                status: 'Pendiente' // Default status for new cobros
+            };
+
+            console.log('Datos del documento a guardar (Cuenta de Cobro):', documentData);
+
+            // Check if editing an existing cobro
+            const existingIndex = invoices.findIndex(doc => doc.id === documentData.id && doc.tipoDocumento === 'Cuenta de Cobro');
+            if (existingIndex !== -1) {
+                invoices[existingIndex] = documentData;
+                showAlert('Cuenta de Cobro actualizada exitosamente.', 'success');
+            } else {
+                invoices.push(documentData);
+                showAlert('Cuenta de Cobro guardada exitosamente.', 'success');
+            }
+
+            saveData();
+            resetCobroForm();
+            renderInvoicesTable();
+            updateSummary();
+            showSection('manageInvoicesSection'); // Go to manage documents after saving
         });
 
         function resetForm() {
@@ -1821,49 +2175,114 @@
             currentEditingInvoiceId = null; // Ensure editing state is reset
         }
 
-        // Render Invoices Table
+        function resetCobroForm() {
+            document.getElementById('cobroForm').reset();
+            document.getElementById('cobroId').value = '';
+            document.getElementById('cobroFecha').value = new Date().toISOString().split('T')[0];
+            document.getElementById('cobroSumaTexto').value = '';
+            generateCobroNumber();
+        }
+
+        // Function to convert number to text (e.g., 300000 -> Trescientos mil)
+        // This is a simplified version and might not handle all numbers perfectly.
+        function numberToWords(num) {
+            const units = ['', 'uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho', 'nueve'];
+            const teens = ['diez', 'once', 'doce', 'trece', 'catorce', 'quince', 'dieciséis', 'diecisiete', 'dieciocho', 'diecinueve'];
+            const tens = ['', '', 'veinte', 'treinta', 'cuarenta', 'cincuenta', 'sesenta', 'setenta', 'ochenta', 'noventa'];
+            const hundreds = ['', 'ciento', 'doscientos', 'trescientos', 'cuatrocientos', 'quinientos', 'seiscientos', 'setecientos', 'ochocientos', 'novecientos'];
+
+            function convertLessThanOneThousand(n) {
+                if (n === 0) return '';
+                if (n < 10) return units[n];
+                if (n < 20) return teens[n - 10];
+                if (n < 100) {
+                    const ten = Math.floor(n / 10);
+                    const unit = n % 10;
+                    return tens[ten] + (unit !== 0 ? ' y ' + units[unit] : '');
+                }
+                const hundred = Math.floor(n / 100);
+                const remainder = n % 100;
+                if (hundred === 1 && remainder === 0) return 'cien';
+                return hundreds[hundred] + ' ' + convertLessThanOneThousand(remainder);
+            }
+
+            if (num === 0) return 'cero pesos';
+            let numStr = num.toFixed(2); // Ensure two decimal places for cents
+            let [integerPart, decimalPart] = numStr.split('.');
+            let integer = parseInt(integerPart);
+            let words = '';
+
+            if (integer >= 1000000) {
+                const millions = Math.floor(integer / 1000000);
+                words += convertLessThanOneThousand(millions) + (millions === 1 ? ' millón ' : ' millones ');
+                integer %= 1000000;
+            }
+
+            if (integer >= 1000) {
+                const thousands = Math.floor(integer / 1000);
+                words += convertLessThanOneThousand(thousands) + ' mil ';
+                integer %= 1000;
+            }
+
+            words += convertLessThanOneThousand(integer);
+
+            words = words.trim();
+            if (words === '') words = 'cero'; // For cases like 0.XX
+
+            return words.charAt(0).toUpperCase() + words.slice(1) + ' pesos';
+        }
+
+        function updateCobroAmountText() {
+            const cobroSumaInput = document.getElementById('cobroSuma');
+            const cobroSumaTextoInput = document.getElementById('cobroSumaTexto');
+            const amount = parseFloat(cobroSumaInput.value) || 0;
+            cobroSumaTextoInput.value = numberToWords(amount);
+        }
+
+        // Render Invoices Table (now for all documents)
         function renderInvoicesTable() {
             const tbody = document.getElementById('invoicesTableBody');
             tbody.innerHTML = ''; // Clear existing rows
 
             if (invoices.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No hay facturas para mostrar.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No hay documentos para mostrar.</td></tr>'; // Updated colspan
                 return;
             }
 
-            // Sort invoices by date descending to show latest first or original then duplicated below it
-            const sortedInvoices = [...invoices].sort((a, b) => {
-                // Primary sort: by date, descending
-                const dateA = new Date(a.fechaFactura);
-                const dateB = new Date(b.fechaFactura);
+            // Sort documents by date descending
+            const sortedDocuments = [...invoices].sort((a, b) => {
+                const dateA = new Date(a.fechaDocumento);
+                const dateB = new Date(b.fechaDocumento);
                 if (dateB.getTime() !== dateA.getTime()) {
                     return dateB.getTime() - dateA.getTime();
                 }
-                // Secondary sort: keep duplicated project below original if on same date
-                // This is a complex logic and might need more specific identifiers if we want strict ordering.
-                // For now, new IDs will naturally appear later, which usually places them lower in a simple sort.
-                return 0; // Maintain original order if dates are the same
+                return 0;
             });
 
-            sortedInvoices.forEach(invoice => {
+            sortedDocuments.forEach(doc => {
                 const row = tbody.insertRow();
+                // Determine client name based on document type
+                const clientName = doc.tipoDocumento === 'Cuenta de Cobro' ? doc.cliente.nombre : doc.cliente.nombre;
+                const totalDisplay = doc.total ? `$${doc.total.toFixed(2)}` : '$0.00';
+
                 row.innerHTML = `
-                    <td>${invoice.numeroFactura}</td>
-                    <td>${invoice.cliente.nombre}</td>
-                    <td>${invoice.fechaFactura}</td>
-                    <td>$${invoice.total ? invoice.total.toFixed(2) : '0.00'}</td>
-                    <td><span class="status ${invoice.status.toLowerCase().replace(/\s/g, '')}">${invoice.status}</span></td>
+                    <td>${doc.numeroDocumento}</td>
+                    <td>${doc.tipoDocumento}</td>
+                    <td>${clientName}</td>
+                    <td>${doc.fechaDocumento}</td>
+                    <td>${totalDisplay}</td>
+                    <td><span class="status ${doc.status.toLowerCase().replace(/\s/g, '')}">${doc.status}</span></td>
                     <td class="actions">
-                        <button class="btn btn-info" onclick="viewInvoice('${invoice.id}')" title="Ver"><i class="fas fa-eye"></i></button>
-                        <button class="btn btn-secondary" onclick="editInvoice('${invoice.id}')" title="Editar"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-primary" onclick="duplicateInvoice('${invoice.id}')" title="Duplicar"><i class="fas fa-copy"></i></button>
-                        <button class="btn btn-danger" onclick="deleteInvoice('${invoice.id}')" title="Eliminar"><i class="fas fa-trash"></i></button>
+                        <button class="btn btn-info" onclick="viewDocument('${doc.id}')" title="Ver"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-secondary" onclick="editDocument('${doc.id}')" title="Editar"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-primary" onclick="duplicateDocument('${doc.id}')" title="Duplicar"><i class="fas fa-copy"></i></button>
+                        <button class="btn btn-danger" onclick="deleteDocument('${doc.id}')" title="Eliminar"><i class="fas fa-trash"></i></button>
                     </td>
                 `;
             });
         }
 
-        // Filter Invoices
+        // Filter Invoices (now documents)
         function filterInvoices() {
             const searchTerm = document.getElementById('searchInvoice').value.toLowerCase();
             const rows = document.getElementById('invoicesTableBody').getElementsByTagName('tr');
@@ -1871,7 +2290,7 @@
             for (let i = 0; i < rows.length; i++) {
                 const row = rows[i];
                 const numeroDoc = row.cells[0].textContent.toLowerCase();
-                const clienteNombre = row.cells[1].textContent.toLowerCase();
+                const clienteNombre = row.cells[2].textContent.toLowerCase(); // Client name is now cell 2
 
                 if (numeroDoc.includes(searchTerm) || clienteNombre.includes(searchTerm)) {
                     row.style.display = '';
@@ -1881,114 +2300,142 @@
             }
         }
 
-        // View Invoice (placeholder - could generate PDF or show a modal)
-        function viewInvoice(id) {
-            const invoice = invoices.find(inv => inv.id === id);
-            if (invoice) {
-                // For simplicity, generate PDF when viewing
-                generatePdf(invoice);
+        // View Document (can be invoice or cobro)
+        function viewDocument(id) {
+            const doc = invoices.find(d => d.id === id);
+            if (doc) {
+                if (doc.tipoDocumento === 'Cuenta de Cobro') {
+                    generateCobroPdf(doc);
+                } else {
+                    generatePdf(doc);
+                }
             }
         }
 
-        function editInvoice(id) {
-            const invoice = invoices.find(inv => inv.id === id);
-            if (invoice) {
+        function editDocument(id) {
+            const doc = invoices.find(d => d.id === id);
+            if (doc) {
+                console.log('Editando documento con ID:', id, 'Documento encontrado:', doc);
                 currentEditingInvoiceId = id; // Set editing state
-                document.getElementById('invoiceId').value = invoice.id;
-                document.getElementById('tipoDocumento').value = invoice.tipoDocumento;
-                document.getElementById('fechaFactura').value = invoice.fechaFactura;
-                document.getElementById('numeroFactura').value = invoice.numeroFactura; // Keep original number when editing
-                document.getElementById('clienteNombre').value = invoice.cliente.nombre;
-                document.getElementById('clienteDireccion').value = invoice.cliente.direccion;
-                document.getElementById('clienteNIT').value = invoice.cliente.nit;
-                document.getElementById('solicitante').value = invoice.cliente.solicitante;
-                document.getElementById('correo').value = invoice.cliente.correo;
-                document.getElementById('telefono').value = invoice.cliente.telefono;
-                document.getElementById('impuesto').value = invoice.impuestoPct;
-                document.getElementById('descuento').value = invoice.descuento;
-                document.getElementById('notas').value = invoice.notas;
 
-                // Clear existing items and add from invoice data
-                document.getElementById('itemsContainer').innerHTML = '';
-                invoice.items.forEach(item => addItem(item));
+                if (doc.tipoDocumento === 'Cuenta de Cobro') {
+                    document.getElementById('cobroId').value = doc.id;
+                    document.getElementById('cobroFecha').value = doc.fechaDocumento;
+                    document.getElementById('cobroNumero').value = doc.numeroDocumento;
+                    document.getElementById('cobroEmpresaACobrar').value = doc.cliente.nombre;
+                    document.getElementById('cobroNitDeudor').value = doc.cliente.nit || '';
+                    document.getElementById('cobroSuma').value = doc.cobroDetails.suma;
+                    document.getElementById('cobroConceptos').value = doc.cobroDetails.conceptos;
+                    document.getElementById('cobroPersonaQueCobra').value = doc.cobroDetails.personaQueCobra;
+                    document.getElementById('cobroCcCreditor').value = doc.cobroDetails.ccCreditor || '';
+                    document.getElementById('cobroTelefonoCreditor').value = doc.cobroDetails.telefonoCreditor || '';
+                    document.getElementById('cobroDireccionCreditor').value = doc.cobroDetails.direccionCreditor || '';
+                    updateCobroAmountText(); // Update text representation
+                    console.log('Formulario de Cuenta de Cobro poblado con:');
+                    console.log('cobroId:', document.getElementById('cobroId').value);
+                    console.log('cobroFecha:', document.getElementById('cobroFecha').value);
+                    console.log('cobroEmpresaACobrar:', document.getElementById('cobroEmpresaACobrar').value);
+                    showSection('createCobroSection');
+                } else {
+                    document.getElementById('invoiceId').value = doc.id;
+                    document.getElementById('tipoDocumento').value = doc.tipoDocumento;
+                    document.getElementById('fechaFactura').value = doc.fechaDocumento;
+                    document.getElementById('numeroFactura').value = doc.numeroDocumento; // Keep original number when editing
+                    document.getElementById('clienteNombre').value = doc.cliente.nombre;
+                    document.getElementById('clienteDireccion').value = doc.cliente.direccion;
+                    document.getElementById('clienteNIT').value = doc.cliente.nit;
+                    document.getElementById('solicitante').value = doc.cliente.solicitante;
+                    document.getElementById('correo').value = doc.cliente.correo;
+                    document.getElementById('telefono').value = doc.cliente.telefono;
+                    document.getElementById('impuesto').value = doc.impuestoPct;
+                    document.getElementById('descuento').value = doc.descuento;
+                    document.getElementById('notas').value = doc.notas;
 
-                // Load images for editing
-                selectedImages = invoice.images || [];
-                renderImagePreviews();
+                    // Clear existing items and add from document data
+                    document.getElementById('itemsContainer').innerHTML = '';
+                    doc.items.forEach(item => addItem(item));
 
-                calculateTotal(); // Ensure totals are correct after loading
+                    // Load images for editing
+                    selectedImages = doc.images || [];
+                    renderImagePreviews();
 
-                showSection('createInvoiceSection'); // Go to create/edit section
+                    calculateTotal(); // Ensure totals are correct after loading
+                    console.log('Formulario de Factura/Cotización/OS poblado con:');
+                    console.log('invoiceId:', document.getElementById('invoiceId').value);
+                    console.log('tipoDocumento:', document.getElementById('tipoDocumento').value);
+                    console.log('clienteNombre:', document.getElementById('clienteNombre').value);
+                    console.log('items:', doc.items); // Check if items are loaded
+                    console.log('selectedImages:', selectedImages); // Check if images are loaded
+                    showSection('createInvoiceSection'); // Go to create/edit section
+                }
+            } else {
+                console.warn('Documento no encontrado para editar con ID:', id);
+                showAlert('Documento no encontrado para editar.', 'error');
             }
         }
 
-        function duplicateInvoice(id) {
-            const originalInvoice = invoices.find(inv => inv.id === id);
-            if (originalInvoice) {
-                // Create a deep copy to avoid modifying the original object by reference
-                const duplicatedInvoice = JSON.parse(JSON.stringify(originalInvoice));
+        function duplicateDocument(id) {
+            const originalDoc = invoices.find(doc => doc.id === id);
+            if (originalDoc) {
+                const duplicatedDoc = JSON.parse(JSON.stringify(originalDoc));
+                duplicatedDoc.id = generateUniqueId();
+                duplicatedDoc.fechaDocumento = new Date().toISOString().split('T')[0]; // Set current date
 
-                // Generate new unique ID
-                duplicatedInvoice.id = generateUniqueId();
-                
-                // Get current document type and generate a new number based on it
-                const tipoDoc = originalInvoice.tipoDocumento;
+                // Generate new number based on document type
                 const today = new Date();
                 const year = today.getFullYear();
                 const month = (today.getMonth() + 1).toString().padStart(2, '0');
-
                 let lastNumbers = JSON.parse(localStorage.getItem(LAST_NUMBER_KEY) || '{}');
                 
                 if (!lastNumbers[year]) {
-                    lastNumbers = {}; // Reset for new year if year changes
+                    lastNumbers = {};
                     lastNumbers[year] = {};
                 }
                 if (!lastNumbers[year][month]) {
                     lastNumbers[year][month] = {
                         'Factura de Servicio / Venta': 0,
                         'Cotización': 0,
-                        'Orden de Servicio': 0
+                        'Orden de Servicio': 0,
+                        'Cuenta de Cobro': 0
                     };
                 }
 
-                let currentNumber = lastNumbers[year][month][tipoDoc] || 0;
+                let currentNumber = lastNumbers[year][month][duplicatedDoc.tipoDocumento] || 0;
                 currentNumber++;
-                lastNumbers[year][month][tipoDoc] = currentNumber;
+                lastNumbers[year][month][duplicatedDoc.tipoDocumento] = currentNumber;
                 localStorage.setItem(LAST_NUMBER_KEY, JSON.stringify(lastNumbers));
 
                 const prefixMap = {
                     'Factura de Servicio / Venta': 'FAC',
                     'Cotización': 'COT',
-                    'Orden de Servicio': 'OS'
+                    'Orden de Servicio': 'OS',
+                    'Cuenta de Cobro': 'COB'
                 };
-                const prefix = prefixMap[tipoDoc];
-                duplicatedInvoice.numeroFactura = `${prefix}-${year}${month}-${String(currentNumber).padStart(3, '0')}`;
+                const prefix = prefixMap[duplicatedDoc.tipoDocumento];
+                duplicatedDoc.numeroDocumento = `${prefix}-${year}${month}-${String(currentNumber).padStart(3, '0')}`;
+                
+                duplicatedDoc.status = 'Pendiente'; // Set status to Pendiente for the new duplicated document
 
-                // Set current date for the duplicated invoice
-                duplicatedInvoice.fechaFactura = today.toISOString().split('T')[0];
-                duplicatedInvoice.status = 'Pendiente'; // Set status to Pendiente for the new duplicated project
+                invoices.push(duplicatedDoc);
+                saveData();
+                renderInvoicesTable();
+                updateSummary();
 
-                // Add the duplicated invoice directly to the invoices array
-                invoices.push(duplicatedInvoice);
-                saveData(); // Save the updated invoices array to localStorage
-                renderInvoicesTable(); // Re-render the table to show the new duplicate
-                updateSummary(); // Update the summary counts
-
-                showAlert('Proyecto duplicado exitosamente. Ahora aparece en tu lista de facturas.', 'success');
-                showSection('manageInvoicesSection'); // Stay on manage invoices section
+                showAlert('Documento duplicado exitosamente. Ahora aparece en tu lista de documentos.', 'success');
+                showSection('manageInvoicesSection');
             } else {
-                showAlert('No se pudo encontrar el proyecto para duplicar.', 'error');
+                showAlert('No se pudo encontrar el documento para duplicar.', 'error');
             }
         }
 
 
-        function deleteInvoice(id) {
-            showConfirm('¿Estás seguro de que quieres eliminar esta factura? Esta acción no se puede deshacer.', () => {
-                invoices = invoices.filter(inv => inv.id !== id);
+        function deleteDocument(id) {
+            showConfirm('¿Estás seguro de que quieres eliminar este documento? Esta acción no se puede deshacer.', () => {
+                invoices = invoices.filter(doc => doc.id !== id);
                 saveData();
                 renderInvoicesTable();
                 updateSummary();
-                showAlert('Factura eliminada exitosamente.', 'success');
+                showAlert('Documento eliminado exitosamente.', 'success');
             });
         }
 
@@ -2000,10 +2447,10 @@
             let invoicesThisYear = 0;
             const currentYear = new Date().getFullYear();
 
-            invoices.forEach(invoice => {
-                totalEarnings += invoice.total;
-                const invoiceYear = new Date(invoice.fechaFactura).getFullYear();
-                if (invoiceYear === currentYear) {
+            invoices.forEach(doc => {
+                totalEarnings += doc.total;
+                const docYear = new Date(doc.fechaDocumento).getFullYear();
+                if (docYear === currentYear) {
                     invoicesThisYear++;
                 }
             });
@@ -2011,42 +2458,45 @@
             document.getElementById('totalEarnings').textContent = `$${totalEarnings.toFixed(2)}`;
             document.getElementById('invoicesThisYear').textContent = invoicesThisYear;
 
-            // Update latest invoices table
+            // Update latest documents table
             const latestInvoicesTableBody = document.getElementById('latestInvoicesTableBody');
             latestInvoicesTableBody.innerHTML = '';
             
-            // Sort invoices by date descending to get latest
-            const sortedInvoices = [...invoices].sort((a, b) => new Date(b.fechaFactura) - new Date(a.fechaFactura));
-            const displayCount = Math.min(sortedInvoices.length, 5); // Display top 5
+            // Sort documents by date descending to get latest
+            const sortedDocuments = [...invoices].sort((a, b) => new Date(b.fechaDocumento) - new Date(a.fechaDocumento));
+            const displayCount = Math.min(sortedDocuments.length, 5); // Display top 5
 
             if (displayCount === 0) {
-                latestInvoicesTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay facturas recientes.</td></tr>';
+                latestInvoicesTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No hay documentos recientes.</td></tr>';
             }
             else {
                 for (let i = 0; i < displayCount; i++) {
-                    const invoice = sortedInvoices[i];
+                    const doc = sortedDocuments[i];
+                    const clientName = doc.tipoDocumento === 'Cuenta de Cobro' ? doc.cliente.nombre : doc.cliente.nombre;
                     const row = latestInvoicesTableBody.insertRow();
                     row.innerHTML = `
-                        <td>${invoice.numeroFactura}</td>
-                        <td>${invoice.cliente.nombre}</td>
-                        <td>${invoice.fechaFactura}</td>
-                        <td>$${invoice.total ? invoice.total.toFixed(2) : '0.00'}</td>
-                        <td><span class="status ${invoice.status.toLowerCase().replace(/\s/g, '')}">${invoice.status}</span></td>
+                        <td>${doc.numeroDocumento}</td>
+                        <td>${doc.tipoDocumento}</td>
+                        <td>${clientName}</td>
+                        <td>${doc.fechaDocumento}</td>
+                        <td>$${doc.total ? doc.total.toFixed(2) : '0.00'}</td>
+                        <td><span class="status ${doc.status.toLowerCase().replace(/\s/g, '')}">${doc.status}</span></td>
                     `;
                 }
             }
         }
 
-        // PDF Generation
-        async function generatePdf(invoice = null) {
+        // PDF Generation for Factura/Cotizacion/Orden de Servicio
+        async function generatePdf(documentData = null) {
             const pdfTemplate = document.getElementById('pdfTemplate');
-            const pdfDocumentTitle = document.getElementById('pdfDocumentTitle'); // Get the new title element
+            const pdfCobroTemplate = document.getElementById('pdfCobroTemplate'); // Get cobro template
+            const pdfDocumentTitle = document.getElementById('pdfDocumentTitle');
 
-            // Use the invoice currently in the form, or the passed invoice object
-            const dataToUse = invoice || {
+            // Determine which data to use and which template to show
+            const dataToUse = documentData || {
                 tipoDocumento: document.getElementById('tipoDocumento').value,
-                fechaFactura: document.getElementById('fechaFactura').value,
-                numeroFactura: document.getElementById('numeroFactura').value,
+                fechaDocumento: document.getElementById('fechaFactura').value,
+                numeroDocumento: document.getElementById('numeroFactura').value,
                 cliente: {
                     nombre: document.getElementById('clienteNombre').value,
                     direccion: document.getElementById('clienteDireccion').value,
@@ -2066,15 +2516,25 @@
                 descuento: parseFloat(document.getElementById('descuento').value) || 0,
                 total: parseFloat(document.getElementById('totalDisplay').textContent.replace('$', '')) || 0,
                 notas: document.getElementById('notas').value,
-                images: selectedImages // Use selected images from the form
+                images: selectedImages
             };
 
-            // Populate PDF template with data
-            pdfDocumentTitle.textContent = dataToUse.tipoDocumento.toUpperCase(); // Set the large title
+            // If it's a Cuenta de Cobro, call the specific PDF generation function
+            if (dataToUse.tipoDocumento === 'Cuenta de Cobro') {
+                generateCobroPdf(dataToUse);
+                return;
+            }
+
+            // Hide cobro template, show main template
+            pdfCobroTemplate.style.display = 'none';
+            pdfTemplate.style.display = 'block';
+
+            // Populate PDF template with data for Factura/Cotizacion/OS
+            pdfDocumentTitle.textContent = dataToUse.tipoDocumento.toUpperCase();
 
             document.getElementById('pdfTipoDocumento').textContent = dataToUse.tipoDocumento;
-            document.getElementById('pdfNumeroFactura').textContent = dataToUse.numeroFactura;
-            document.getElementById('pdfFechaFactura').textContent = dataToUse.fechaFactura;
+            document.getElementById('pdfNumeroFactura').textContent = dataToUse.numeroDocumento;
+            document.getElementById('pdfFechaFactura').textContent = dataToUse.fechaDocumento;
 
             document.getElementById('pdfClienteNombre').textContent = dataToUse.cliente.nombre;
             document.getElementById('pdfClienteDireccion').textContent = dataToUse.cliente.direccion;
@@ -2083,7 +2543,6 @@
             document.getElementById('pdfCorreo').textContent = dataToUse.cliente.correo;
             document.getElementById('pdfTelefono').textContent = dataToUse.cliente.telefono;
 
-            // Set the company name in the PDF with the highlight style
             document.getElementById('pdfCompanyName').textContent = settings.companyName || 'Nombre de tu Empresa';
 
 
@@ -2143,6 +2602,15 @@
                 });
 
                 const imgData = canvas.toDataURL('image/png');
+                
+                // --- NEW: Check for valid imgData ---
+                if (!imgData || imgData === 'data:,') { // data:, is often returned for empty canvas
+                    console.error('html2canvas generated empty or invalid image data for main PDF.');
+                    showAlert('Error: No se pudo capturar el contenido del documento para el PDF. Inténtalo de nuevo.', 'error');
+                    return; // Stop execution if image data is invalid
+                }
+                // --- END NEW ---
+
                 const imgWidth = 612; // PDF page width (letter size)
                 const pageHeight = 792; // PDF page height (letter size)
                 const imgHeight = canvas.height * imgWidth / canvas.width;
@@ -2162,7 +2630,7 @@
 
                 // Clean up file name
                 const tipoDoc = dataToUse.tipoDocumento.replace(/[^a-zA-Z0-9]/g, '');
-                const numDoc = dataToUse.numeroFactura.replace(/[^a-zA-Z0-9]/g, '');
+                const numDoc = dataToUse.numeroDocumento.replace(/[^a-zA-Z0-9]/g, '');
                 const cliente = dataToUse.cliente.nombre.replace(/[^a-zA-Z0-9]/g, '_'); // Limpiar caracteres especiales
                 const fileName = `${tipoDoc}_${numDoc}_${cliente}.pdf`;
 
@@ -2182,8 +2650,142 @@
             }
         }
 
-        // Function to update company info in PDF header
+        // PDF Generation for Cuenta de Cobro
+        async function generateCobroPdf(documentData = null) {
+            const pdfTemplate = document.getElementById('pdfTemplate');
+            const pdfCobroTemplate = document.getElementById('pdfCobroTemplate');
+
+            // Use data from the cobro form, or the passed documentData object
+            const dataToUse = documentData || {
+                tipoDocumento: 'Cuenta de Cobro',
+                fechaDocumento: document.getElementById('cobroFecha').value,
+                numeroDocumento: document.getElementById('cobroNumero').value,
+                cliente: { // Debtor info
+                    nombre: document.getElementById('cobroEmpresaACobrar').value,
+                    nit: document.getElementById('cobroNitDeudor').value
+                },
+                cobroDetails: { // Creditor and cobro specific info
+                    suma: parseFloat(document.getElementById('cobroSuma').value) || 0,
+                    conceptos: document.getElementById('cobroConceptos').value,
+                    personaQueCobra: document.getElementById('cobroPersonaQueCobra').value,
+                    ccCreditor: document.getElementById('cobroCcCreditor').value,
+                    telefonoCreditor: document.getElementById('cobroTelefonoCreditor').value,
+                    direccionCreditor: document.getElementById('cobroDireccionCreditor').value
+                },
+                total: parseFloat(document.getElementById('cobroSuma').value) || 0 // Total is the sum
+            };
+
+            // Hide main template, show cobro template
+            pdfTemplate.style.display = 'none';
+            pdfCobroTemplate.style.display = 'block';
+
+            // Populate PDF template for Cuenta de Cobro
+            document.getElementById('pdfCobroNumero').textContent = dataToUse.numeroDocumento;
+            
+            // Populate large debtor info
+            document.getElementById('pdfCobroEmpresaACobrarGrande').textContent = dataToUse.cliente.nombre.toUpperCase();
+            document.getElementById('pdfCobroNitDeudorGrande').textContent = `Nit. ${dataToUse.cliente.nit || 'XXX.XXX.XXX-X'}`;
+
+
+            document.getElementById('pdfCobroPersonaQueCobra').textContent = dataToUse.cobroDetails.personaQueCobra;
+            document.getElementById('pdfCobroCcCreditor').textContent = dataToUse.cobroDetails.ccCreditor;
+            // Assuming city/department are part of the address or not strictly needed for PDF based on image
+            document.getElementById('pdfCobroCiudadCreditor').textContent = ''; // Placeholder, adjust if you add city/dept input
+            document.getElementById('pdfCobroDepartamentoCreditor').textContent = ''; // Placeholder
+
+            document.getElementById('pdfCobroSumaTexto').textContent = numberToWords(dataToUse.cobroDetails.suma);
+            document.getElementById('pdfCobroSumaNumerica').textContent = `$${dataToUse.cobroDetails.suma.toFixed(2)}`;
+
+            const conceptsList = document.getElementById('pdfCobroConceptosList');
+            conceptsList.innerHTML = '';
+            dataToUse.cobroDetails.conceptos.split('\n').filter(line => line.trim() !== '').forEach(concept => {
+                const li = document.createElement('li');
+                li.textContent = concept.trim();
+                conceptsList.appendChild(li);
+            });
+
+            document.getElementById('pdfCobroFirmaPersonaQueCobra').textContent = dataToUse.cobroDetails.personaQueCobra;
+            document.getElementById('pdfCobroFirmaCcCreditor').textContent = dataToUse.cobroDetails.ccCreditor;
+            document.getElementById('pdfCobroFirmaTelefonoCreditor').textContent = dataToUse.cobroDetails.telefonoCreditor; // Corrected typo here
+            document.getElementById('pdfCobroFirmaDireccionCreditor').textContent = dataToUse.cobroDetails.direccionCreditor;
+
+            // Company info for cobro header
+            document.getElementById('pdfCobroCompanyLogo').src = settings.companyLogoBase64 || 'LOGO COLOR.png';
+            document.getElementById('pdfCobroCompanyName').textContent = settings.companyName || 'NOMBRE DE TU EMPRESA';
+            document.getElementById('pdfCobroCompanyNIT').textContent = settings.companyNIT || 'NIT: XXX.XXX.XXX-X';
+            document.getElementById('pdfCobroCompanyAddress').textContent = settings.companyAddress || 'Dirección de tu Empresa';
+            document.getElementById('pdfCobroCompanyPhone').textContent = settings.companyPhone || 'Teléfono: (XXX) XXX-XXXX';
+            document.getElementById('pdfCobroCompanyEmail').textContent = settings.companyEmail || 'Email: tu_correo@empresa.com';
+
+            // Bank info for cobro footer
+            document.getElementById('pdfCobroBankName').textContent = settings.bankName || 'Nombre del Banco';
+            document.getElementById('pdfCobroAccountType').textContent = settings.accountType || 'Tipo de Cuenta';
+            document.getElementById('pdfCobroAccountNumber').textContent = settings.accountNumber || 'Número de Cuenta';
+
+
+            // Make PDF template visible but off-screen for html2canvas to render it
+            pdfCobroTemplate.style.position = 'absolute';
+            pdfCobroTemplate.style.left = '-9999px';
+            pdfCobroTemplate.style.display = 'block';
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'pt', 'letter');
+
+            try {
+                const canvas = await html2canvas(pdfCobroTemplate, {
+                    scale: 2,
+                    useCORS: true
+                });
+
+                const imgData = canvas.toDataURL('image/png');
+                
+                // --- NEW: Check for valid imgData ---
+                if (!imgData || imgData === 'data:,') { // data:, is often returned for empty canvas
+                    console.error('html2canvas generated empty or invalid image data for Cobro PDF.');
+                    showAlert('Error: No se pudo capturar el contenido del documento para el PDF. Inténtalo de nuevo.', 'error');
+                    return; // Stop execution if image data is invalid
+                }
+                // --- END NEW ---
+
+                const imgWidth = 612;
+                const pageHeight = 792;
+                const imgHeight = canvas.height * imgWidth / canvas.width;
+                let heightLeft = imgHeight;
+
+                let position = 0;
+
+                doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    doc.addPage();
+                    doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+
+                const tipoDoc = dataToUse.tipoDocumento.replace(/[^a-zA-Z0-9]/g, '');
+                const numDoc = dataToUse.numeroDocumento.replace(/[^a-zA-Z0-9]/g, '');
+                const cliente = dataToUse.cliente.nombre.replace(/[^a-zA-Z0-9]/g, '_');
+                const fileName = `${tipoDoc}_${numDoc}_${cliente}.pdf`;
+
+                doc.save(fileName);
+                showAlert('PDF de Cuenta de Cobro generado exitosamente y descargado.', 'success');
+
+            } catch (error) {
+                console.error('Error al generar el PDF de Cuenta de Cobro:', error);
+                showAlert('Error al generar el PDF de Cuenta de Cobro. Por favor, inténtalo de nuevo.', 'error');
+            } finally {
+                pdfCobroTemplate.style.position = '';
+                pdfCobroTemplate.style.left = '';
+                pdfCobroTemplate.style.display = 'none';
+            }
+        }
+
+
+        // Function to update company info in PDF header (used by both PDF types)
         function updatePdfHeaderInfo() {
+            // For main PDF template
             document.getElementById('pdfHeaderCompanyName').textContent = settings.companyName || 'Nombre de tu Empresa';
             document.getElementById('pdfCompanyAddress').textContent = settings.companyAddress || 'Dirección de tu Empresa';
             document.getElementById('pdfCompanyPhone').textContent = settings.companyPhone || 'Teléfono: (XXX) XXX-XXXX';
@@ -2195,9 +2797,21 @@
                 pdfCompanyLogo.src = settings.companyLogoBase64;
                 pdfCompanyLogo.style.display = 'block';
             } else {
-                pdfCompanyLogo.src = 'LOGO COLOR.png'; // Fallback to default logo
+                pdfCompanyLogo.src = 'https://placehold.co/150x50/800020/FFFFFF?text=LOGO'; // Fallback to a placeholder logo
                 pdfCompanyLogo.style.display = 'block'; // Ensure it's visible if default is used
             }
+
+            // For Cobro PDF template (update its specific elements)
+            document.getElementById('pdfCobroCompanyLogo').src = settings.companyLogoBase64 || 'https://placehold.co/100x30/800020/FFFFFF?text=LOGO';
+            document.getElementById('pdfCobroCompanyName').textContent = settings.companyName || 'NOMBRE DE TU EMPRESA';
+            document.getElementById('pdfCobroCompanyNIT').textContent = settings.companyNIT || 'NIT: XXX.XXX.XXX-X';
+            document.getElementById('pdfCobroCompanyAddress').textContent = settings.companyAddress || 'Dirección de tu Empresa';
+            document.getElementById('pdfCobroCompanyPhone').textContent = settings.companyPhone || 'Teléfono: (XXX) XXX-XXXX';
+            document.getElementById('pdfCobroCompanyEmail').textContent = settings.companyEmail || 'Email: tu_correo@empresa.com';
+
+            document.getElementById('pdfCobroBankName').textContent = settings.bankName || 'Nombre del Banco';
+            document.getElementById('pdfCobroAccountType').textContent = settings.accountType || 'Tipo de Cuenta';
+            document.getElementById('pdfCobroAccountNumber').textContent = settings.accountNumber || 'Número de Cuenta';
         }
 
 
@@ -2210,6 +2824,7 @@
             document.getElementById('currentYear').textContent = new Date().getFullYear();
             document.getElementById('pdfCurrentYear').textContent = new Date().getFullYear();
             updatePdfHeaderInfo(); // Initialize PDF header info on load
+            updateCobroAmountText(); // Initialize cobro amount text
         });
 
     </script>
